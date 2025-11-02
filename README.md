@@ -59,39 +59,29 @@ project-name/
 
 ---
 
-## Model / Controller / View — Contoh Daftar (sesuaikan dengan project)
+## Model / Controller / View
 
 ### Models (contoh)
 
-* `UserModel` — register, login, getById, update
-* `ProductModel` — all, findById, create, update, delete
-* `CategoryModel` — all, parent-child
+* `PegawaiModel` — login, getPegawai, updatePegawai, dll
 
 ### Controllers (contoh)
 
-* `AuthController` — register(), login(), logout()
-* `HomeController` — index()
-* `ProductController` — index(), show($id), create(), store(), edit($id), update($id), destroy($id)
-* `ApiController` — endpoint JSON (opsional)
+* `LoginController` — login(), logout()
 
 ### Views (contoh isi)
 
-* `home.php` — tampilan landing
-* `auth/login.php` — form login
-* `auth/register.php` — form registrasi
-* `products/index.php` — daftar produk (tabel / grid)
-* `products/show.php` — detail produk
-* `products/form.php` — partial form untuk create & edit
-* `layouts/main.php` — header/footer/asset includes
+* `dashboard.php` — tampilan data pagawai & jabatan
+* `login.php` — form login
 
 ---
 
 ## Contoh alur kerja MVC (singkat)
 
-1. User buka `GET /products` → `public/index.php` meneruskan ke `Router`.
-2. `Router` memanggil `ProductController::index()`.
-3. `ProductController::index()` mengakses `ProductModel::all()`.
-4. Data dikirim ke `View` `products/index.php`.
+1. User buka `GET /pegawai` → `public/index.php` meneruskan ke `Router`.
+2. `Router` memanggil `PegawaiController::index()`.
+3. `PegawaiController::index()` mengakses `PegawaiModel::all()`.
+4. Data dikirim ke `View` `dashboard.php`.
 5. View dirender ke HTML yang dikirim ke browser.
 
 ---
