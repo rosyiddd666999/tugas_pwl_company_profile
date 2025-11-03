@@ -1,108 +1,98 @@
 <?php
-use \Core\Model;
-class JabatanController
-{
-    /** @var Jabatan */
-    protected $model;
+require_once __DIR__ . '/../Models/JabatanModel.php';
+require_once __DIR__ . '/../../config/database.php';
 
-    public function __construct()
-    {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        $this->model = new Jabatan();
+class JabatanController {
+    private $jabatanModel;
+
+    public function __construct() {
+        $this->checkAuth();
+        $this->jabatanModel = new JabatanModel();
     }
-    public function index()
-    {
-        $data = $this->model->getAll();
-        $view = __DIR__ . '/../views/jabatan/index.php';
-        if (file_exists($view)) {
-            $jabatan = $data; 
-            require_once $view;
-            return;
+
+    private function checkAuth() {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: /login');
+            exit();
         }
-        $_SESSION['jabatan_list'] = $data;
-        header('Location: /');
-        exit;
     }
-    public function create()
-    {
-        $view = __DIR__ . '/../views/jabatan/create.php';
-        if (file_exists($view)) {
-            require_once $view;
-            return;
-        }
-        header('Location: /jabatan');
-        exit;
+
+    public function index() {
+        $query = "SELECT j.*, COUNT(p.id_pegawai) as jumlah_pegawai 
+                  FROM jabatan j 
+                  LEFT JOIN pegawai p ON j.id_jabatan = p.id_jabatan 
+                  GROUP BY j.id_jabatan 
+                  ORDER BY j.nama_jabatan ASC";
+        
+        $database = new Database();
+        $conn = $database->getConnection();
+        $stmt = $conn->prepare($query);
+        $stmt->execute();
+        $jabatan = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        require_once __DIR__ . '/../Views/jabatan.php';
     }
-    public function store()
-    {
-        $nama = isset($_POST['nama_jabatan']) ? trim($_POST['nama_jabatan']) : '';
 
-        if ($nama === '') {
-            $_SESSION['error'] = 'Nama jabatan harus diisi.';
-            header('Location: /jabatan/create');
-            exit;
-        }
-
-        $ok = $this->model->insertData(['nama_jabatan' => $nama]);
-
-        if ($ok) {
-            $_SESSION['success'] = 'Berhasil menambahkan jabatan.';
+    public function getJson($id = null) {
+        header('Content-Type: application/json');
+        
+        if ($id) {
+            $data = $this->jabatanModel->getById($id);
         } else {
-            $_SESSION['error'] = 'Gagal menambahkan jabatan.';
+            $data = $this->jabatanModel->getAll();
         }
-
-        header('Location: /jabatan');
-        exit;
+        
+        echo json_encode($data);
+        exit();
     }
-    public function edit($id)
-    {
-        $row = $this->model->getById($id);
 
-        $view = __DIR__ . '/../views/jabatan/edit.php';
-        if (file_exists($view)) {
-            $jabatan = $row; 
-            require_once $view;
-            return;
+    public function create() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'nama_jabatan' => $_POST['nama_jabatan']
+            ];
+
+            if ($this->jabatanModel->create($data)) {
+                $_SESSION['success'] = 'Data jabatan berhasil ditambahkan';
+            } else {
+                $_SESSION['error'] = 'Gagal menambahkan data jabatan';
+            }
+
+            header('Location: /jabatan');
+            exit();
         }
-        $_SESSION['jabatan_edit'] = $row;
-        header('Location: /jabatan');
-        exit;
     }
-    public function update($id)
-    {
-        $nama = isset($_POST['nama_jabatan']) ? trim($_POST['nama_jabatan']) : '';
 
-        if ($nama === '') {
-            $_SESSION['error'] = 'Nama jabatan harus diisi.';
-            header("Location: /jabatan/edit/{$id}");
-            exit;
+    public function update($id) {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'nama_jabatan' => $_POST['nama_jabatan']
+            ];
+
+            if ($this->jabatanModel->update($id, $data)) {
+                $_SESSION['success'] = 'Data jabatan berhasil diupdate';
+            } else {
+                $_SESSION['error'] = 'Gagal mengupdate data jabatan';
+            }
+
+            header('Location: /jabatan');
+            exit();
         }
-
-        $ok = $this->model->updateData(['nama_jabatan' => $nama], $id);
-
-        if ($ok) {
-            $_SESSION['success'] = 'Berhasil mengubah jabatan.';
-        } else {
-            $_SESSION['error'] = 'Gagal mengubah jabatan.';
-        }
-
-        header('Location: /jabatan');
-        exit;
     }
-    public function delete($id)
-    {
-        $ok = $this->model->deleteData($id);
 
-        if ($ok) {
-            $_SESSION['success'] = 'Berhasil menghapus jabatan.';
-        } else {
-            $_SESSION['error'] = 'Gagal menghapus jabatan.';
+    public function delete($id) {
+        try {
+            if ($this->jabatanModel->delete($id)) {
+                $_SESSION['success'] = 'Data jabatan berhasil dihapus';
+            } else {
+                $_SESSION['error'] = 'Gagal menghapus data jabatan';
+            }
+        } catch (Exception $e) {
+            $_SESSION['error'] = 'Tidak dapat menghapus jabatan yang masih digunakan pegawai';
         }
 
         header('Location: /jabatan');
-        exit;
+        exit();
     }
 }
 ?>

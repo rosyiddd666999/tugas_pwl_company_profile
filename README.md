@@ -197,17 +197,15 @@ CREATE TABLE pegawai (
 
 ---
 
-## Referensi struktur file contoh (snippet kecil `public/index.php`)
+## Cara menjalankan kode
 
-```php
-<?php
-require_once __DIR__ . '/../app/Core/Router.php';
-require_once __DIR__ . '/../app/Controllers/HomeController.php';
-
-$router = new Router();
-$router->get('/', [HomeController::class, 'index']);
-$router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
 ```
+### 1. Masuk direktory public
+cd C:\xampp\htdocs\project\public
 
----
+### 2. jalankan perintah
+php -S localhost:8000
+
+### 3. masuk ke browser ketik url http://localhost:8000/login
+```
 
