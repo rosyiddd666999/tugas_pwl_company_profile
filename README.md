@@ -199,14 +199,15 @@ CREATE TABLE pegawai (
 
 ## Cara menjalankan kode
 
-```
 1. Masuk direktory public
+```
 cd C:\xampp\htdocs\project\public
-
-2. jalankan perintah
-php -S localhost:8000
-
-3. masuk ke browser ketik url http://localhost:8000/login
 ```
 
+3. jalankan perintah
+```
+php -S localhost:8000
+```
+
+5. masuk ke browser ketik url http://localhost:8000/login
 
