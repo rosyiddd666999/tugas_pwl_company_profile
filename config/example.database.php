@@ -1,9 +1,9 @@
 <?php
 class Database {
-    private $host = "localhost";
-    private $db_name = "pegawai";
-    private $username = "root";
-    private $password = "";
+    private $host = "your-host";
+    private $db_name = "your-name-db";
+    private $username = "your-root";
+    private $password = "your-password";
     private $conn;
 
     public function getConnection() {
